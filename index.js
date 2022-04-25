@@ -4,7 +4,7 @@ const port = 5000
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const config = require('./config/key');
-const { auth } =require('./middleware/auth')
+const { auth } =require('./middleware/auth');
 const { User } = require("./models/User");
 
 //application/x-www-form-urlencoded
@@ -21,10 +21,6 @@ mongoose.connect(config.mongoURI, {
 
 app.get('/', (req, res) => {
   res.send('Hello World! 안녕하세요.~')
-})
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
 })
 
 //회원가입을 위한 라우터
@@ -84,4 +80,19 @@ app.get('/api/users/auth', auth, (req, res) => {
     role: req.user.role,
     image: req.user.image
   })
+})
+
+app.get('/api.users/logout', auth, (req, res) => {
+  User.findOneAndUpdate({ _id: req.user._id},
+    { token: ""}
+    , (err, user) => {
+      if (err) return res.json({ success: false, err});
+      return res.status(200).send({
+        success: true
+      })
+    })
+})
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
 })
